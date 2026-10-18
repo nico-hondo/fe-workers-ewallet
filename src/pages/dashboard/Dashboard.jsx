@@ -15,6 +15,7 @@ import { MdOutlineAddCard } from "react-icons/md";
 import { IoWalletOutline } from "react-icons/io5";
 import { FaArrowTrendUp, FaArrowTrendDown } from "react-icons/fa6";
 import { FiDownload, FiUpload } from "react-icons/fi"; // Ikon tambahan untuk Income & Expense
+import { useSelector } from "react-redux";
 
 ChartJS.register(
   CategoryScale,
@@ -83,6 +84,14 @@ const Avatar = ({ name, isBank }) => {
 };
 
 const Dashboard = () => {
+  const profile = useSelector((state) => state.user?.profile)
+
+  const apiBaseUrl = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+  const displayName = profile?.fullName || "User";
+  const userPhoto = profile?.avatar
+    ? `${apiBaseUrl}/${profile.avatar.replace(/^\/+/, "")}`
+    : "image-profile";
+
   const balance = DUMMY_BALANCE;
   const transactions = DUMMY_TRANSACTIONS;
 
@@ -156,11 +165,11 @@ const Dashboard = () => {
       <div className="block md:hidden bg-brand-primary text-white pt-6 pb-16 px-5 relative">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden shrink-0 border-2 border-white/20">
-            <img src="/avatar-placeholder.png" alt="Profile" className="w-full h-full object-cover" />
+            <img src={userPhoto} alt="Profile" className="w-full h-full object-cover" />
           </div>
           <div>
             <p className="text-xs text-blue-100">Hello,</p>
-            <h1 className="text-sm font-medium">Ghaluh Wizard</h1>
+            <h1 className="text-sm font-medium">{displayName}</h1>
           </div>
         </div>
       </div>

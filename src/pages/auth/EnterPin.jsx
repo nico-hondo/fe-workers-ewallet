@@ -44,7 +44,7 @@ function EnterPin() {
                 }`}
               >
                 <span className="text-2xl font-bold text-gray-800">
-                  {pin[index] || ""}
+                  {pin[index] ? "*" : ""}
                 </span>
               </div>
             ))}
