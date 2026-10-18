@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTransactionStatus } from "../../redux/slice/topUpSlice"; // sesuaikan path slice Anda
+import { fetchTransactionStatus } from "../../redux/slice/transactionSlice"; 
 import TopUpSummary from "./TopUpSummary";
 
 function TopUpSummaryGuard() {
@@ -16,6 +16,7 @@ function TopUpSummaryGuard() {
   const invoiceNumber =
     searchParams.get("invoice_number") || searchParams.get("tranx_id");
 
+  console.log(invoiceNumber); 
   useEffect(() => {
     if (!invoiceNumber) {
       navigate("/top-up", { replace: true });
@@ -46,7 +47,7 @@ function TopUpSummaryGuard() {
       amount={transactionData.amount}
       paymentMethod={transactionData.payment_method}
       currentDate={transactionData.created_at}
-      transactionId={transactionData.invoice_number}
+      transactionId={transactionData.trx_code}
       status={transactionData.status}
     />
   );

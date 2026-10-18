@@ -74,7 +74,7 @@ function Topup() {
               <img
                 src={
                   profile?.avatar
-                    ? profile.avatar
+                    ? `${import.meta.env.VITE_API_URL}/${profile.avatar}`
                     : "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"
                 }
                 alt="Photo Profile"

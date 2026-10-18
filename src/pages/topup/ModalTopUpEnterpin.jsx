@@ -39,7 +39,7 @@ function ModalTopUpEnterpin({ setShowModal = () => {}, amount, tax, method }) {
             pin: pin,
             note: "Topup via Web App",
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -48,11 +48,13 @@ function ModalTopUpEnterpin({ setShowModal = () => {}, amount, tax, method }) {
         throw new Error(data?.message || "PIN salah atau transaksi gagal");
       }
 
-      // Berhasil -> Redirect ke DOKU Checkout Payment URL
+      // Berhasil -> Buka DOKU Checkout Payment URL di tab baru (Solusi 2)
       if (data?.data?.payment_url) {
-        toast.info("Mengarahkan ke halaman pembayaran...");
+        toast.info("Membuka halaman pembayaran di tab baru...");
         setShowModal(false);
-        window.loadJokulCheckout(data.data.payment_url);
+
+        // Buka instruksi / simulator pembayaran di tab baru
+        window.open(data.data.payment_url, "_blank");
       } else {
         toast.error("URL Pembayaran tidak ditemukan");
       }
@@ -115,7 +117,9 @@ function ModalTopUpEnterpin({ setShowModal = () => {}, amount, tax, method }) {
         <form onSubmit={handleNext} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <h1 className="text-[29px]">Enter Your Pin 👋</h1>
-            <p className="text-gray-500 text-sm">Enter Your Pin For Transaction</p>
+            <p className="text-gray-500 text-sm">
+              Enter Your Pin For Transaction
+            </p>
           </div>
 
           <div className="flex justify-center gap-3 mt-15 mb-15">
@@ -161,7 +165,9 @@ function ModalTopUpEnterpin({ setShowModal = () => {}, amount, tax, method }) {
           <p className="text-center text-sm text-gray-500 text-[17px]">
             Forgot Your Pin ?{" "}
             <Link to={"/profile/change-pin"}>
-              <span className="cursor-pointer text-blue-700 font-medium">Reset</span>
+              <span className="cursor-pointer text-blue-700 font-medium">
+                Reset
+              </span>
             </Link>
           </p>
         </form>

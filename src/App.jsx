@@ -9,7 +9,7 @@ import FindPeople from "./pages/Transfer/TransferPage";
 import PeopleInformation from "./pages/Transfer/PeopleInformation";
 import History from "./pages/history/History";
 import TopUp from "./pages/topup/Topup";
-import TopUpSummary from "./pages/topup/TopUpSummary";
+// import TopUpSummary from "./pages/topup/TopUpSummary";
 import EditProfile from "./pages/EditProfile";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -17,6 +17,7 @@ import ForgotPass from "./pages/auth/ForgotPass";
 import EnterPin from "./pages/auth/EnterPin";
 import PrivateRoute from "./router/PrivateRouter";
 import NotFound from "./pages/notfound/NotFound";
+import TopUpSummaryGuard from "./pages/topup/TopUpSummaryGuard";
 
 function App() {
   return (
@@ -53,7 +54,7 @@ function App() {
           <Route path="history" element={<History />} />
           <Route path="top-up">
             <Route index element={<TopUp />}/>
-            <Route path="summary" element={<TopUpSummary/>}/>
+            <Route path="summary" element={<TopUpSummaryGuard/>}/>
           </Route>
           <Route path="profile" element={<EditProfile />} />
         </Route>

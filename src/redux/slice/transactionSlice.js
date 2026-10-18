@@ -11,66 +11,66 @@ export const fetchTransactionStatus = createAsyncThunk(
   async (invoiceNumber, { getState, rejectWithValue }) => {
     try {
       const token = getState().auth.token;
+      console.log("[Fetch Topup Summary]-User Token: ", token);
 
       const response = await fetch(
-        `${getBaseUrl()}/top-up/[SESUAIKAN_ENPOINTNYA DO]`,
+        `${getBaseUrl()}/payment/topup/${invoiceNumber}`,
         {
           method: "GET",
           headers: {
-            Authorization: token ? `Bearer ${token}` : "",
+            Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       const data = await response.json().catch(() => null);
 
       if (!response.ok) {
         return rejectWithValue(
-          data?.message || "Gagal memverifikasi status transaksi"
+          data?.message || "Gagal memverifikasi status transaksi",
         );
       }
 
       return data?.data || data;
     } catch (err) {
       return rejectWithValue(
-        err.message || "Gagal terhubung ke server backend"
+        err.message || "Gagal terhubung ke server backend",
       );
     }
-  }
+  },
 );
 
 const topUpSlice = createSlice({
-    name: "topUp",
-    initialState: {
-        transactionData: null,
-        loading: false,
-        error: null,
+  name: "topUp",
+  initialState: {
+    transactionData: null,
+    loading: false,
+    error: null,
+  },
+  reducers: {
+    resetTopUpState: (state) => {
+      state.transactionData = null;
+      state.loading = false;
+      state.error = null;
     },
-    reducers: {
-        resetTopUpState: (state) => {
-            state.transactionData = null;
-            state.loading = false;
-            state.error = null;
-        },
-    },
-    extraReducers: (builder) => {
-        builder
-        .addAsyncThunk(fetchTransactionStatus, {
-            pending: (state) => {
-                state.loading = true;
-                state.error = null;
-            },
-            fulfilled: (state, action) => {
-                state.loading = false;
-                state.transactionData = action.payload;
-            },
-            rejected: (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-                state.transactionData = null;
-            },
-        });
-    },
+  },
+  extraReducers: (builder) => {
+    builder.addAsyncThunk(fetchTransactionStatus, {
+      pending: (state) => {
+        state.loading = true;
+        state.error = null;
+      },
+      fulfilled: (state, action) => {
+        state.loading = false;
+        state.transactionData = action.payload;
+      },
+      rejected: (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.transactionData = null;
+      },
+    });
+  },
 });
 export const { resetTopUpState } = topUpSlice.actions;
 export default topUpSlice.reducer;
