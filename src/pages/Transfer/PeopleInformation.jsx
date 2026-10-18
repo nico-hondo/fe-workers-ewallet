@@ -1,11 +1,8 @@
 import { useState } from "react";
-import {
-  FiSend,
-  FiStar,
-  FiX,
-} from "react-icons/fi";
+import { FiSend, FiStar, FiX } from "react-icons/fi";
 import { VscVerified } from "react-icons/vsc";
 import { CiMoneyCheck1 } from "react-icons/ci";
+import { useSelector } from "react-redux";
 
 // const navigation = [
 //   { name: "Dashboard", icon: FiGrid },
@@ -15,64 +12,13 @@ import { CiMoneyCheck1 } from "react-icons/ci";
 //   { name: "Profile", icon: FiUser },
 // ];
 
-const contacts = [
-  {
-    id: 1,
-    name: "Ghaluh 1",
-    phone: "0815-555-0108",
-    icon: VscVerified,
-    verificated: "Verified",
-  },
-  {
-    id: 2,
-    name: "Albert Flores",
-    phone: "0812-555-0108",
-    icon: VscVerified,
-    verificated: "Verified",
-  },
-  {
-    id: 3,
-    name: "Bessie Cooper",
-    phone: "0896-555-0108",
-    icon: VscVerified,
-    verificated: "Verified",
-  },
-  {
-    id: 4,
-    name: "Jacob Jones",
-    phone: "0871-555-0108",
-    icon: VscVerified,
-    verificated: "Verified",
-  },
-  {
-    id: 5,
-    name: "Leslie Alexander",
-    phone: "0830-555-0108",
-    icon: VscVerified,
-    verificated: "Verified",
-  },
-  {
-    id: 6,
-    name: "Cody Fisher",
-    phone: "0877-555-0108",
-    icon: VscVerified,
-    verificated: "Verified",
-  },
-  {
-    id: 7,
-    name: "Ralph Edwards",
-    phone: "0855-555-0108",
-    icon: VscVerified,
-    verificated: "Verified",
-  },
-];
-
 function PeopleInformation({
-  selectedId,
+  contact,
   amount,
   setAmount,
   notes,
   setNotes,
+  onTransferSuccess,
   onFinishSuccess,
   onSendAgain,
   onBackDashboard,
@@ -81,7 +27,41 @@ function PeopleInformation({
   const [modalPin, setModalPin] = useState(false);
   const [pin, setPin] = useState("");
   const [resultModal, setResultModal] = useState(null);
-  const contact = contacts.find((item) => item.id === selectedId);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const { token } = useSelector((state) => state.auth);
+
+  const handleConfirmPin = async () => {
+    setSubmitting(true);
+    setErrorMsg("");
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/transfer`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          receiver_id: contact.id,
+          amount: Number(amount),
+          pin,
+          note: notes,
+        }),
+      });
+      const json = await res.json();
+
+      if (!json.success) throw new Error(json.message);
+      onTransferSuccess(json.data);
+      setResultModal("success");
+    } catch (err) {
+      setErrorMsg(err.message);
+      setResultModal("failed");
+    } finally {
+      setPin("");
+      setModalPin(false);
+      setSubmitting(false);
+    }
+  };
 
   const toggleFavorites = (id) => {
     if (favorites.includes(id)) {
@@ -151,17 +131,27 @@ function PeopleInformation({
                 className="flex flex-1 items-center gap-5 text-left"
               >
                 <div className="flex h-17 w-17 shrink-0 items-center justify-center rounded-md bg-blue-100 text-sm font-semibold text-brand-primary">
-                  {contact.name.charAt(0)}
+                  {contact.avatar ? (
+                    <img
+                      src={contact.avatar}
+                      alt=""
+                      className="h-full w-full rounded-md object-cover"
+                    />
+                  ) : (
+                    (contact.fullname ?? "?").charAt(0).toUpperCase()
+                  )}
                 </div>
                 <div className="flex flex-col gap-1">
                   <p className="text-sm font-medium text-brand-secondary">
-                    {contact.name}
+                    {contact.fullname ?? "Unknown"}
                   </p>
-                  <p className="text-xs text-gray-500">{contact.phone}</p>
+                  <p className="text-xs text-gray-500">
+                    {contact.phone ?? "-"}
+                  </p>
                   <div className="bg-brand-primary rounded-lg text-brand-gray h-4 flex items-center p-1.5 gap-2 w-fit lg:p-4">
                     <VscVerified size={14} />
                     <span className="text-[10px] lg:text-[14px] text-brand-gray">
-                      {contact.verificated}
+                      Verified
                     </span>
                   </div>
                 </div>
@@ -266,7 +256,7 @@ function PeopleInformation({
           <div className="flex w-full max-w-87.5 min-h-125 max-h-[calc(100dvh-32px)] flex-col overflow-y-auto rounded-xl bg-brand-gray p-5">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-brand-secondary">
-                TRANSFER TO {contact?.name.toUpperCase()}
+                TRANSFER TO {(contact?.fullname ?? "").toUpperCase()}
               </p>
               <button
                 type="button"
@@ -317,16 +307,11 @@ function PeopleInformation({
 
             <button
               type="button"
-              disabled={pin.length !== 6}
-              onClick={() => {
-                setPin("");
-                setModalPin(false);
-                setResultModal("success");
-                // setResultModal("failed"); if failed
-              }}
+              disabled={pin.length !== 6 || submitting}
+              onClick={handleConfirmPin}
               className="mt-auto h-11 w-full shrink-0 cursor-pointer rounded-md bg-brand-primary text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Next
+              {submitting ? "Processing..." : "Next"}
             </button>
 
             <p className="mt-4 text-center text-xs text-gray-400">
@@ -341,15 +326,15 @@ function PeopleInformation({
         <div className="absolute inset-x-0 top-0 bottom-16.25 z-50 flex items-center justify-center overflow-y-auto bg-black/60 px-4 py-4 lg:inset-0">
           <div className="flex w-full max-w-87.5 flex-col rounded-xl bg-white p-4 shadow-lg lg:max-w-92.5">
             <p className="border-b border-gray-200 pb-3 text-xs font-medium text-brand-secondary">
-              TRANSFER TO {contact?.name.toUpperCase()}
+              TRANSFER TO {(contact?.fullname ?? "").toUpperCase()}
             </p>
 
             <div className="mt-5 flex items-center justify-center">
               <img
                 src={
                   resultModal === "success"
-                    ? "/public/modalSucces.svg"
-                    : "/public/modalFailed.svg"
+                    ? "/modalSucces.svg"
+                    : "/modalFailed.svg"
                 }
                 alt={
                   resultModal === "success"
@@ -375,7 +360,8 @@ function PeopleInformation({
             <p className="mt-4 text-center text-xs text-gray-500">
               {resultModal === "success"
                 ? "Thank you for using this application for your financial"
-                : "Sorry, there is an issue with your transfer. Try again later!"}
+                : errorMsg ||
+                  "Sorry, there is an issue with your transfer. Try again later!"}
             </p>
 
             {/* PRIMARY BUTTON */}

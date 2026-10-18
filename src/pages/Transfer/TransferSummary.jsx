@@ -1,33 +1,20 @@
 import { FiSend, FiCheckCircle, FiRepeat, FiHome } from "react-icons/fi";
 import { Link } from "react-router";
 
-const contacts = [
-  { id: 1, name: "Ghaluh 1", phone: "0815-555-0108" },
-  { id: 2, name: "Albert Flores", phone: "0812-555-0108" },
-  { id: 3, name: "Bessie Cooper", phone: "0896-555-0108" },
-  { id: 4, name: "Jacob Jones", phone: "0871-555-0108" },
-  { id: 5, name: "Leslie Alexander", phone: "0830-555-0108" },
-  { id: 6, name: "Cody Fisher", phone: "0877-555-0108" },
-  { id: 7, name: "Ralph Edwards", phone: "0855-555-0108" },
-];
-
 function TransferSummary({
-  selectedId,
+  contact,
   amount,
-  notes,
-  transactionId,
-  transactionDate,
+  result,
   onSendAgain,
   onBackDashboard,
 }) {
-  const contact = contacts.find((item) => item.id === selectedId);
-
-  const formattedAmount = amount
-    ? `Rp ${amount.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+  const rawAmount = String(result?.amount ?? amount ?? "");
+  const formattedAmount = rawAmount
+    ? `Rp ${rawAmount.replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
     : "Rp 0";
 
-  const currentDate = transactionDate
-    ? new Date(transactionDate).toLocaleString("id-ID", {
+  const currentDate = result?.created_at
+    ? new Date(result.created_at).toLocaleString("id-ID", {
         day: "2-digit",
         month: "short",
         year: "numeric",
@@ -113,9 +100,9 @@ function TransferSummary({
               <span className="text-sm text-gray-500">To</span>
               <div className="text-right">
                 <p className="text-sm font-medium text-brand-secondary">
-                  {contact?.name || "-"}
+                  {result?.receiver_name || contact?.fullname || "-"}
                 </p>
-                <p className="text-xs text-gray-500">{contact?.phone || "-"}</p>
+                <p className="text-xs text-gray-500">{contact?.phone ?? "-"}</p>
               </div>
             </div>
 
@@ -129,14 +116,14 @@ function TransferSummary({
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <span className="text-sm text-gray-500">Transaction ID</span>
               <p className="text-sm font-medium text-brand-secondary">
-                {transactionId}
+                {result?.trx_code ?? "-"}
               </p>
             </div>
 
             <div className="flex items-start justify-between border-b border-gray-100 pb-3">
               <span className="text-sm text-gray-500">Notes</span>
               <p className="max-w-[60%] text-right text-sm font-medium text-brand-secondary">
-                {notes || "-"}
+                {result?.note || "-"}
               </p>
             </div>
 
