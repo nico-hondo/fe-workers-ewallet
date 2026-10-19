@@ -238,13 +238,6 @@ function EditProfile() {
               >
                 Change PIN
               </button>
-              <button
-                type="button"
-                onClick={() => setShow("set")}
-                className="text-blue-800 pt-2 cursor-pointer hover:text-blue-500"
-              >
-                Set PIN
-              </button>
             </div>
           </div>
           {error && (

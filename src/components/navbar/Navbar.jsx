@@ -66,7 +66,7 @@ const Navbar = ({ isMenuOpen, setIsMenuOpen }) => {
       <nav className="flex items-center justify-between px-5 py-4 lg:px-12">
         <div className="flex flex-row items-center gap-3">
           <img src={iconWallet} width={40} />
-          <Link to="/" className="font-jakarta text-2xl font-semibold">
+          <Link to="/" className="font-jakarta text-sm md:text-xl font-semibold">
             Worker Wallet
           </Link>
         </div>

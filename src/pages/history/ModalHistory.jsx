@@ -1,103 +1,107 @@
-import { toast } from "react-toastify";
+// import { useState } from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
 
-const DEFAULT_CUSTOMER = {
-  id: 1,
-  contact_name: "Budi Santoso",
-  phone_number: "081234567801",
-  transaction_type: "Transfer",
-  original_amount: 350000,
-  status: true,
+const getTypeLabel = (type) => {
+  switch (type) {
+    case "transfer_out":
+      return "Transfer keluar";
+    case "transfer_in":
+      return "Transfer masuk";
+    case "topup":
+      return "Top up";
+    default:
+      return type || "Transaksi";
+  }
 };
 
-const Avatar = ({ name }) => {
-  const initials = name
-    .split(" ")
-    .map((w) => w[0])
+// const isTopup = (type) => String(type).trim().toLowerCase() === "topup";
+
+const getInitials = (name = "") =>
+  name
+    .trim()
+    .split(/\s+/)
+    .map((word) => word[0])
+    .filter(Boolean)
     .slice(0, 2)
     .join("")
     .toUpperCase();
 
-  return (
-    <div className="w-15 h-15 shrink-0 rounded-xl bg-gray-200 text-gray-700 flex items-center justify-center font-semibold">
-      {initials}
-    </div>
-  );
-};
+function ModalHistory({ customer, onClose, onDelete }) {
+  // const [avatarFailed, setAvatarFailed] = useState(false);
+  const amount = Number(customer.amount) || 0;
+  // const getAvatarUrl = (avatar) => {
+    //   if (!avatar) return "";
+    //   if (/^(https?:|data:)/i.test(avatar)) return avatar;
+    //   const clean = avatar.replace(/^\/+/, "").replace(/^public\//, "");
+    //   const baseUrl = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+    //   return `${baseUrl}/image/${clean.replace(/^image\//, "")}`;
+  // };
 
-function ModalHistory({
-  setIsOpen = () => {},
-  customer = DEFAULT_CUSTOMER,
-  onDelete,
-}) {
-  const handleDelete = () => {
-    if (onDelete) {
-      onDelete(customer);
-      return;
-    }
-    toast.success("Berhasil Menghapus histori", { autoClose: 1500 });
-    setIsOpen(false);
-  };
-
-  const isSuccess = customer.status ?? true;
+  // const avatarUrl = getAvatarUrl(customer.avatar);
 
   return (
     <>
       <header className="px-5">
-        <h1 className="text-gray-500">DETAIL TRANSACTION</h1>
-        <hr className="border-t border-gray-500" />
-        <div className="py-5">
-          <Avatar name={customer.contact_name} />
-        </div>
+        <h2 className="text-gray-500">DETAIL TRANSAKSI</h2>
+        <hr className="border-t border-gray-300" />
+        {customer.avatar  ? (
+          <img
+            src={`http://localhost:5173${customer.avatar}`}
+            alt={`Avatar ${customer.name || "kontak"}`}
+            className="mt-5 h-15 w-15 rounded-xl object-contain"
+            // onError={() => setAvatarFailed(true)}
+          />
+        ) : (
+          <div
+            className="mt-5 flex h-15 w-15 items-center justify-center rounded-xl bg-gray-200 font-semibold text-gray-700"
+            role="img"
+            aria-label={`Avatar ${customer.name || "kontak"}`}
+          >
+            {getInitials(customer.name || "Unknown")}
+          </div>
+        )}
       </header>
 
-      {/* pembungkus data user */}
-      <div className="px-5 flex flex-col gap-2">
+      <div className="flex flex-col gap-3 px-5 py-5">
         <div>
-          <h1 className="font-medium">Name:</h1>
-          <p className="text-gray-500">{customer.contact_name}</p>
+          <h3 className="font-medium">Nama</h3>
+          <p className="text-gray-500">{customer.name || "Unknown"}</p>
+        </div>
+        {customer.phone && (
+          <div>
+            <h3 className="font-medium">Nomor telepon</h3>
+            <p className="text-gray-500">{customer.phone}</p>
+          </div>
+        )}
+        <div>
+          <h3 className="font-medium">Jenis transaksi</h3>
+          <p className="text-gray-500">{getTypeLabel(customer.type)}</p>
         </div>
         <div>
-          {customer.phone_number && (
-            <>
-              <h1 className="font-medium">Phone:</h1>
-              <p className="text-gray-500">{customer.phone_number}</p>
-            </>
-          )}
-        </div>
-        <div>
-          <h1 className="font-medium">Status:</h1>
-          <p className="text-gray-500">{isSuccess ? "Transfer Success" : "Transfer Failed"}</p>
-        </div>
-        <div>
-          <h1 className="font-medium">Amount:</h1>
+          <h3 className="font-medium">Nominal</h3>
           <p
-            className={`font-semibold lg:text-lg ${
-              customer.transaction_type === "Send"
-                ? "text-red-500"
-                : "text-green-500"
-            }`}
+            className={`font-semibold lg:text-lg ${amount < 0 ? "text-red-500" : "text-green-600"}`}
           >
-            Rp.{customer.original_amount.toLocaleString("id-ID")}
+            {amount < 0 ? "-" : "+"}Rp{Math.abs(amount).toLocaleString("id-ID")}
           </p>
         </div>
       </div>
 
-      <div className="px-5 mt-5 flex flex-col gap-5">
+      <div className="flex flex-col gap-3 px-5">
         <button
           type="button"
-          className="border border-red-600 rounded-lg w-full flex justify-center items-center gap-5 h-10 cursor-pointer"
-          onClick={handleDelete}
+          className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-red-600 font-medium text-red-600 hover:bg-red-50"
+          onClick={onDelete}
         >
-          <RiDeleteBin6Line className="text-red-600" />
-          <p className="text-red-600 font-medium">Delete</p>
+          <RiDeleteBin6Line aria-hidden="true" />
+          Hapus dari riwayat
         </button>
         <button
           type="button"
-          className="bg-blue-600 rounded-lg w-full flex justify-center items-center gap-5 h-10 cursor-pointer"
-          onClick={() => setIsOpen(false)}
+          className="h-10 w-full cursor-pointer rounded-lg bg-blue-600 font-medium text-white"
+          onClick={onClose}
         >
-          <p className="text-white font-medium">Back</p>
+          Tutup
         </button>
       </div>
     </>
