@@ -62,7 +62,7 @@ function App() {
           <Route index element={<Login />} />
           <Route path="register" element={<Register />} />
           <Route path="forgot-password" element={<ForgotPass />} />
-          <Route path="enter-pin" element={<EnterPin/>}/>
+          <Route path="set-pin" element={<EnterPin/>}/>
         </Route>
       </Routes>
     </>

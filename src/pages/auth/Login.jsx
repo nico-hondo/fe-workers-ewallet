@@ -43,12 +43,19 @@ function Login() {
     const action = await dispatch(loginUser({ email, password }));
 
     if (loginUser.fulfilled.match(action)) {
+      console.log(action.payload);
       toast.dismiss();
       toast.success(action.payload?.message || "Login Berhasil!", {
         position: "top-center",
         autoClose: 1000,
       });
-      setTimeout(() => navigate("/"), 1500);
+      setTimeout(() => {
+        if (action.payload.user.has_pin) {
+          navigate("/dashboard");
+          return
+        }
+        navigate("/auth/set-pin")
+      }, 1500);
     } else if (loginUser.rejected.match(action)) {
       toast.dismiss();
       toast.error(

@@ -170,6 +170,9 @@ const authSlice = createSlice({
       state.success = false;
       state.error = null;
     },
+    successSetPin: (state) => {
+      state.user.has_pin = true
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -265,5 +268,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { resetAuthState, clearAuth } = authSlice.actions;
+export const { resetAuthState, clearAuth, successSetPin } = authSlice.actions;
 export default authSlice.reducer;
