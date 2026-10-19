@@ -63,8 +63,8 @@ function EnterPin() {
   };
 
   return (
-    <main className="w-full min-h-screen flex flex-col md:flex-row justify-center items-stretch bg-blue-600 font-montserrat">
-      <section className="w-full md:w-1/2 flex-1 flex flex-col justify-center gap-6 px-8 md:px-16 lg:px-24 py-12 bg-white md:rounded-tr-3xl md:rounded-br-3xl z-10 shadow-xl">
+    <main className="w-full min-h-screen flex flex-col md:flex-row justify-center items-stretch bg-brand-secondary font-montserrat">
+      <section className="w-full md:w-1/2 flex-1 flex flex-col justify-center gap-6 px-8 md:px-16 lg:px-24 py-12 bg-brand-primary md:rounded-tr-3xl md:rounded-br-3xl z-10 shadow-xl">
         <div className="flex gap-2.5 items-center">
           <img
             src={walletIcon}
@@ -76,10 +76,10 @@ function EnterPin() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-200">
             Enter Your Pin 👋
           </h2>
-          <p className="text-gray-500 text-xs md:text-sm">
+          <p className="text-gray-300 text-xs md:text-sm">
             Please save your pin because this so important.
           </p>
         </div>
@@ -92,7 +92,7 @@ function EnterPin() {
                   pin.length === index ? "border-blue-600" : "border-gray-200"
                 }`}
               >
-                <span className="text-2xl font-bold text-gray-800">
+                <span className="text-2xl font-bold text-gray-200">
                   {pin[index] ? "•" : ""}
                 </span>
               </div>
@@ -111,13 +111,13 @@ function EnterPin() {
           <button
             type="submit"
             disabled={pin.length !== 6}
-            className="h-11 w-full max-w-md cursor-pointer rounded-lg bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-11 w-full max-w-md cursor-pointer rounded-lg bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:cursor-not-allowed disabled:opacity-70"
           >
             Submit
           </button>
         </form>
       </section>
-      <section className="hidden md:flex md:w-1/2 bg-blue-600 justify-center p-8 relative overflow-hidden">
+      <section className="hidden md:flex md:w-1/2 bg-brand-secondary justify-center p-8 relative overflow-hidden">
         <img
           src={enterIcon}
           alt="enter-pin-illustration"
