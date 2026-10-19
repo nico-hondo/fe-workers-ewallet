@@ -1,39 +1,35 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import FindPeople from "./FindPeople";
 import PeopleInformation from "./PeopleInformation";
 import TransferSummary from "./TransferSummary";
 
 function TransferPage() {
-  const [selectedId, setSelectedId] = useState(null);
+  const navigate = useNavigate();
+  const [contact, setContact] = useState(null);
   const [step, setStep] = useState("findPeople");
   const [amount, setAmount] = useState("");
   const [notes, setNotes] = useState("");
-  const [transactionId, setTransactionId] = useState("");
-  const [transactionDate, setTransactionDate] = useState("");
+  const [result, setResult] = useState(null); 
 
-  const handleSelectContact = (id) => {
-    setSelectedId(id);
+  const handleSelectContact = (selected) => {
+    setContact(selected);
     setStep("setNominal");
   };
 
   const handleSendAgain = () => {
-    setSelectedId(null);
+    setContact(null);
     setAmount("");
     setNotes("");
-    setTransactionId("");
-    setTransactionDate("");
+    setResult(null);
     setStep("findPeople");
   };
 
-  const handleBackDashboard = () => {
-    console.log("back to dashboard");
-  };
+  const handleBackDashboard = () => navigate("/dashboard");
 
-  const handleFinishSuccess = () => {
-    setTransactionId(`TRX-${Date.now()}`);
-    setTransactionDate(new Date().toISOString());
-    setStep("finish");
-  };
+  const handleTransferSuccess = (data) => setResult(data);
+
+  const handleFinishSuccess = () => setStep("finish");
 
   return (
     <>
@@ -43,11 +39,12 @@ function TransferPage() {
 
       {step === "setNominal" && (
         <PeopleInformation
-          selectedId={selectedId}
+          contact={contact}
           amount={amount}
           setAmount={setAmount}
           notes={notes}
           setNotes={setNotes}
+          onTransferSuccess={handleTransferSuccess}
           onFinishSuccess={handleFinishSuccess}
           onSendAgain={handleSendAgain}
           onBackDashboard={handleBackDashboard}
@@ -56,11 +53,9 @@ function TransferPage() {
 
       {step === "finish" && (
         <TransferSummary
-          selectedId={selectedId}
+          contact={contact}
           amount={amount}
-          notes={notes}
-          transactionId={transactionId}
-          transactionDate={transactionDate}
+          result={result}
           onSendAgain={handleSendAgain}
           onBackDashboard={handleBackDashboard}
         />

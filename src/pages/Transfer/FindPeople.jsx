@@ -1,44 +1,50 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiSearch, FiStar, FiSend } from "react-icons/fi";
-
-const contacts = [
-  { id: 1, name: "Ghaluh 1", phone: "(239) 555-0108" },
-  { id: 2, name: "Albert Flores", phone: "(239) 555-0108" },
-  { id: 3, name: "Bessie Cooper", phone: "(239) 555-0108" },
-  { id: 4, name: "Jacob Jones", phone: "(239) 555-0108" },
-  { id: 5, name: "Leslie Alexander", phone: "(239) 555-0108" },
-  { id: 6, name: "Cody Fisher", phone: "(239) 555-0108" },
-  { id: 7, name: "Ralph Edwards", phone: "(239) 555-0108" },
-];
+import { useSelector } from "react-redux";
 
 function FindPeople({ onSelectContact }) {
+  const { token } = useSelector((state) => state.auth);
   const [search, setSearch] = useState("");
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [favorites, setFavorites] = useState([]);
 
-  const filteredContacts = contacts.filter((contact) => {
-    const searchValue = search.toLowerCase().trim();
+  useEffect(() => {
+    const getContacts = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/transfer/search?q=${search}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        const json = await res.json();
 
-    const searchNumber = search.replace(/\D/g, "");
-    const phoneNumber = contact.phone.replace(/\D/g, "");
+        if (!json.success) throw new Error(json.message);
+        setContacts(json.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    const matchName = contact.name.toLowerCase().includes(searchValue);
-
-    const matchPhone =
-      searchNumber.length > 0 && phoneNumber.includes(searchNumber);
-
-    return matchName || matchPhone;
-  });
+    getContacts();
+  }, [search, token]);
 
   const toggleFavorites = (id) => {
-    if (favorites.includes(id)) {
-      setFavorites(favorites.filter((item) => item !== id));
-    } else {
-      setFavorites([...favorites, id]);
-    }
+    setFavorites((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
+    );
   };
 
   const selectContact = (contact) => {
-    onSelectContact(contact.id);
+    onSelectContact(contact);
   };
 
   return (
@@ -63,7 +69,9 @@ function FindPeople({ onSelectContact }) {
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-primary text-white font-medium">
                 1
               </span>
-              <span className="text-brand-primary font-medium">Find People</span>
+              <span className="text-brand-primary font-medium">
+                Find People
+              </span>
             </div>
 
             <div className="w-16 border-t border-dashed border-gray-300" />
@@ -95,7 +103,7 @@ function FindPeople({ onSelectContact }) {
               </h3>
 
               <p className="mt-1 hidden text-xs text-gray-500 lg:block">
-                {filteredContacts.length} Results Found
+                {contacts.length} Results Found
               </p>
             </div>
 
@@ -113,7 +121,7 @@ function FindPeople({ onSelectContact }) {
           </div>
 
           <div className="flex flex-col gap-2 lg:gap-0">
-            {filteredContacts.map((contact, index) => (
+            {contacts.map((contact, index) => (
               <div
                 key={contact.id}
                 className={`flex items-center justify-between rounded-lg px-3 py-3 transition-colors hover:bg-brand-primary/5 lg:rounded-none lg:px-5 ${
@@ -126,16 +134,24 @@ function FindPeople({ onSelectContact }) {
                   className="flex min-w-0 flex-1 cursor-pointer items-center gap-4 text-left lg:grid lg:grid-cols-3 lg:gap-4"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-sm font-semibold text-brand-primary lg:justify-self-center">
-                    {contact.name.charAt(0)}
+                    {contact.avatar ? (
+                      <img
+                        src={contact.avatar}
+                        alt=""
+                        className="h-full w-full rounded-lg object-cover"
+                      />
+                    ) : (
+                      (contact.fullname ?? "?").charAt(0).toUpperCase()
+                    )}
                   </div>
 
                   <div className="min-w-0 lg:contents">
                     <p className="truncate text-sm font-medium text-brand-secondary lg:text-center">
-                      {contact.name}
+                      {contact.fullname ?? "Unknown"}
                     </p>
 
                     <p className="text-xs text-gray-500 lg:text-center">
-                      {contact.phone}
+                      {contact.phone ?? "-"}
                     </p>
                   </div>
                 </button>
@@ -157,7 +173,17 @@ function FindPeople({ onSelectContact }) {
               </div>
             ))}
 
-            {filteredContacts.length === 0 && (
+            {loading && (
+              <p className="py-8 text-center text-sm text-gray-400">
+                Loading...
+              </p>
+            )}
+
+            {error && !loading && (
+              <p className="py-8 text-center text-sm text-red-500">{error}</p>
+            )}
+
+            {!loading && !error && contacts.length === 0 && (
               <p className="py-8 text-center text-sm text-gray-400">
                 No contacts found
               </p>
