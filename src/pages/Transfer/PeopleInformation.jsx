@@ -289,7 +289,7 @@ function PeopleInformation({
                   }`}
                 >
                   <span className="text-3xl font-medium text-brand-secondary">
-                    {pin[index] || ""}
+                    {pin[index] ? "•" : ""}
                   </span>
                 </div>
               ))}
