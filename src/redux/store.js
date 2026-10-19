@@ -12,6 +12,7 @@ import {
 import authReducer from "./slice/authSlice";
 import userReducer from "./slice/userSlice";
 import topUpReducer from "./slice/transactionSlice";
+import historyReducer from "./slice/historySlice";
 
 const storage = {
   getItem: (key) => Promise.resolve(window.localStorage.getItem(key)),
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   user: userReducer,
   topUp: topUpReducer,
+  history: historyReducer,
 });
 
 const persistConfig = {
