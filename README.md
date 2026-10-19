@@ -197,4 +197,8 @@ Developed as a collaborative project by **The Workers**. Follow the team's Git b
 
 ## License
 
-No project-level license file was found in the supplied frontend archive. Confirm the intended license with the repository maintainers before adding a license declaration.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Related Repositories
+
+- **Backend Repository:** [api-workers-ewallet](https://github.com/rcontrisha/api-workers-ewallet)
