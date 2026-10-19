@@ -152,11 +152,67 @@ export const setPin = createAsyncThunk(
   },
 );
 
+export const getDashboardSummary = createAsyncThunk(
+  "user/getDashboardSummary",
+  async(_, {getState, rejectWithValue}) => {
+    try{
+      const token = getState().auth.token;
+      
+      const response = await fetch(`${getBaseUrl()}/user/dashboard-summary`, {
+        headers: {
+          Authorization:`Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if(!response.ok){
+        return rejectWithValue(
+          data?.message || "Gagal mengambil summary dashboard"
+        );
+      }
+      return data?.data || data;
+    } catch(err){
+      return rejectWithValue(
+        err.message || "Gagal terhubung ke server backend",
+      )
+    }
+  }
+)
+
+export const getDashboardHistory = createAsyncThunk(
+  "user/getDashboardHistory",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().auth.token;
+      const response = await fetch(`${getBaseUrl()}/user/dashboard-history`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        return rejectWithValue(
+          data?.message || "Gagal mengambil riwayat transaksi dashboard"
+        );
+      }
+
+      return data?.data || data;
+    } catch (error) {
+      return rejectWithValue(
+        error.message || "Gagal mengambil riwayat transaksi dashboard"
+      );
+    }
+  }
+);
+
 const userSlice = createSlice({
   name: "user",
   initialState: {
     profile: null,
+    dashboardSummary: null,
+    dashboardHistory: [],
     loading: false,
+    dashboardLoading: false,
     error: null,
     securityLoading: false,
     securityError: null,
@@ -164,6 +220,8 @@ const userSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.profile = null;
+      state.dashboardSummary = null;
+      state.dashboardHistory = [];
     },
   },
   extraReducers: (builder) => {
@@ -251,6 +309,30 @@ const userSlice = createSlice({
           state.securityLoading = false;
           state.securityError = action.payload;
         },
+      })
+      .addAsyncThunk(getDashboardSummary, {
+        pending: (state) => {
+          state.dashboardLoading = true;
+        },
+        fulfilled: (state, action) => {
+          state.dashboardLoading = false;
+          state.dashboardSummary = action.payload;
+        },
+        rejected: (state) => {
+          state.dashboardLoading = false;
+        }
+      })
+      .addAsyncThunk(getDashboardHistory, {
+        pending: (state) => {
+          state.dashboardLoading = true;
+        },
+        fulfilled: (state, action) => {
+          state.dashboardLoading = false;
+          state.dashboardHistory = action.payload || [];
+        },
+        rejected: (state) => {
+          state.dashboardLoading = false;
+        }
       });
   },
 });
